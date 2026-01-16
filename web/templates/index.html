@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>局域网文件传输工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* 左侧边栏 */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #34495e;
+            text-align: center;
+        }
+        
+        .sidebar h3 {
+            margin-bottom: 15px;
+        }
+        
+        .user-list {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        
+        .user-item {
+            padding: 10px;
+            border-bottom: 1px solid #34495e;
+            cursor: pointer;
+        }
+        
+        .user-item:hover {
+            background-color: #34495e;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 顶部导航 */
+        .header {
+            background-color: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .username-section {
+            display: flex;
+            align-items: center;
+        }
+        
+        .username-section input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        
+        .username-section button {
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .username-section button:hover {
+            background-color: #2980b9;
+        }
+        
+        /* 内容区 */
+        .content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        /* 文件列表区 */
+        .file-section {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .file-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .upload-btn {
+            padding: 10px 20px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .upload-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        .delete-btn {
+            padding: 10px 20px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .delete-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        .file-list {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .file-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .file-meta {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .download-btn {
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .download-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .delete-file-btn {
+            padding: 8px 15px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .delete-file-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .file-checkbox {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+        
+        /* 聊天区 */
+        .chat-section {
+            width: 300px;
+            background-color: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+        }
+        
+        .message .username {
+            font-weight: bold;
+            color: #3498db;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .message .content {
+            word-wrap: break-word;
+        }
+        
+        .message .content img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        
+        .message .timestamp {
+            font-size: 10px;
+            color: #7f8c8d;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .chat-input-area {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: none;
+        }
+        
+        .chat-input-area button {
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .chat-input-area button:hover {
+            background-color: #2980b9;
+        }
+        
+        #image-input {
+            display: none;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .content {
+                flex-direction: column;
+            }
+            
+            .chat-section {
+                width: 100%;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>在线用户</h3>
+            </div>
+            <div class="user-list" id="user-list">
+                <!-- 用户列表将通过JavaScript动态生成 -->
+            </div>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 顶部导航 -->
+            <div class="header">
+                <h2>局域网文件传输工具</h2>
+                <div class="username-section">
+                    <input type="text" id="username-input" placeholder="修改用户名">
+                    <button id="update-username-btn">修改</button>
+                </div>
+            </div>
+            
+            <!-- 内容区 -->
+            <div class="content">
+                <!-- 文件列表区 -->
+                <div class="file-section">
+                    <div class="file-header">
+                        <h3>文件列表</h3>
+                        <div>
+                            <button class="upload-btn" onclick="document.getElementById('file-input').click()">上传文件</button>
+                            <button class="delete-btn" id="batch-delete-btn" onclick="batchDeleteFiles()" disabled>批量删除</button>
+                            <input type="file" id="file-input" multiple onchange="uploadFiles()">
+                        </div>
+                    </div>
+                    <div class="file-list" id="file-list">
+                        <!-- 文件列表将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 聊天区 -->
+                <div class="chat-section">
+                    <div class="chat-header">
+                        <h3>聊天</h3>
+                    </div>
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- 聊天消息将通过JavaScript动态生成 -->
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="message-input" placeholder="输入消息..." onkeypress="sendMessageOnEnter(event)">
+                        <button onclick="document.getElementById('image-input').click()">📷</button>
+                        <input type="file" id="image-input" accept="image/*" onchange="sendImage()">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        // 全局变量
+        let socket = null;
+        let currentUser = null;
+        
+        // 初始化
+        function init() {
+            // 连接Socket.IO服务器
+            socket = io();
+            
+            // 绑定事件
+            bindEvents();
+            
+            // 发送登录事件
+            socket.emit('user_login', {
+                device_info: navigator.userAgent
+            });
+        }
+        
+        // 绑定事件
+        function bindEvents() {
+            // 登录成功
+            socket.on('login_success', function(user) {
+                currentUser = user;
+                document.getElementById('username-input').value = user.username;
+            });
+            
+            // 用户列表更新
+            socket.on('user_list_update', function(data) {
+                updateUserList(data.users);
+            });
+            
+            // 文件列表更新
+            socket.on('file_list_update', function(data) {
+                updateFileList(data.files);
+            });
+            
+            // 新消息
+            socket.on('new_message', function(message) {
+                addMessage(message);
+            });
+            
+            // 用户名更新
+            socket.on('username_updated', function(user) {
+                currentUser = user;
+                document.getElementById('username-input').value = user.username;
+            });
+            
+            // 修改用户名按钮
+            document.getElementById('update-username-btn').addEventListener('click', function() {
+                updateUsername();
+            });
+        }
+        
+        // 更新用户列表
+        function updateUserList(users) {
+            const userList = document.getElementById('user-list');
+            userList.innerHTML = '';
+            
+            users.forEach(function(user) {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                userItem.innerHTML = `
+                    <div class="username">${user.username}</div>
+                    <div style="font-size: 12px; color: #bdc3c7;">${user.ip_address}</div>
+                `;
+                userList.appendChild(userItem);
+            });
+        }
+        
+        // 更新文件列表
+        function updateFileList(files) {
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = '';
+            
+            files.forEach(function(file) {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <input type="checkbox" class="file-checkbox" data-filename="${file.filename}" onchange="updateBatchDeleteButton()">
+                    <div class="file-info">
+                        <div class="file-name">${file.filename}</div>
+                        <div class="file-meta">
+                            ${formatFileSize(file.size)} • ${file.mtime}
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <a href="${file.url}" class="download-btn" download>下载</a>
+                        <button class="delete-file-btn" onclick="deleteFile('${file.filename}')">删除</button>
+                    </div>
+                `;
+                fileList.appendChild(fileItem);
+            });
+            
+            updateBatchDeleteButton();
+        }
+        
+        // 更新批量删除按钮状态
+        function updateBatchDeleteButton() {
+            const checkboxes = document.querySelectorAll('.file-checkbox:checked');
+            const batchDeleteBtn = document.getElementById('batch-delete-btn');
+            batchDeleteBtn.disabled = checkboxes.length === 0;
+        }
+        
+        // 删除单个文件
+        function deleteFile(filename) {
+            if (confirm(`确定要删除文件 ${filename} 吗？`)) {
+                fetch(`/delete/${encodeURIComponent(filename)}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('文件删除成功:', filename);
+                    } else {
+                        alert('文件删除失败: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('文件删除错误:', error);
+                    alert('文件删除失败');
+                });
+            }
+        }
+        
+        // 批量删除文件
+        function batchDeleteFiles() {
+            const checkboxes = document.querySelectorAll('.file-checkbox:checked');
+            const filenames = Array.from(checkboxes).map(cb => cb.dataset.filename);
+            
+            if (filenames.length === 0) {
+                alert('请选择要删除的文件');
+                return;
+            }
+            
+            if (confirm(`确定要删除选中的 ${filenames.length} 个文件吗？`)) {
+                fetch('/batch-delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ filenames: filenames })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('批量删除成功:', filenames.length, '个文件');
+                    } else {
+                        alert('批量删除失败: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('批量删除错误:', error);
+                    alert('批量删除失败');
+                });
+            }
+        }
+        
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // 上传文件
+        function uploadFiles() {
+            const fileInput = document.getElementById('file-input');
+            const files = fileInput.files;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                // 发送文件上传请求
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('文件上传成功:', data.filename);
+                    } else {
+                        alert('文件上传失败: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('文件上传错误:', error);
+                    alert('文件上传失败');
+                });
+            }
+            
+            // 清空文件输入
+            fileInput.value = '';
+        }
+        
+        // 修改用户名
+        function updateUsername() {
+            const newUsername = document.getElementById('username-input').value.trim();
+            if (newUsername && newUsername !== currentUser.username) {
+                socket.emit('update_username', {
+                    username: newUsername
+                });
+            }
+        }
+        
+        // 发送消息
+        function sendMessage() {
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value.trim();
+            
+            if (message) {
+                socket.emit('send_message', {
+                    message: message
+                });
+                messageInput.value = '';
+            }
+        }
+        
+        // 回车键发送消息
+        function sendMessageOnEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        // 发送图片
+        function sendImage() {
+            const imageInput = document.getElementById('image-input');
+            const file = imageInput.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    socket.emit('send_message', {
+                        message: e.target.result,
+                        is_image: true
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // 清空文件输入
+            imageInput.value = '';
+        }
+        
+        // 添加消息到聊天区
+        function addMessage(message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            let content = '';
+            if (message.is_image) {
+                content = `<img src="${message.message}" alt="图片消息">`;
+            } else {
+                content = message.message;
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="username">${message.username}</div>
+                <div class="content">${content}</div>
+                <div class="timestamp">${message.timestamp}</div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            
+            // 滚动到底部
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

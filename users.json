@@ -1,0 +1,53 @@
+{
+  "users": [
+    {
+      "user_id": "3a912fd8-e272-4c63-b824-60644388ad8d",
+      "username": "测试用户",
+      "ip_address": "192.168.1.100",
+      "device_info": "test device",
+      "last_seen": "2026-01-16 16:19:06"
+    },
+    {
+      "user_id": "98306f7b-0faf-4826-a71c-bfe4a6403cc0",
+      "username": "sad",
+      "ip_address": "192.168.75.171",
+      "device_info": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+      "last_seen": "2026-01-16 16:55:07"
+    },
+    {
+      "user_id": "674532cf-4e14-4c73-beff-e70a0267aeb1",
+      "username": "更新后的测试用户",
+      "ip_address": "192.168.1.200",
+      "device_info": "test device",
+      "last_seen": "2026-01-16 16:27:11"
+    },
+    {
+      "user_id": "28b7de83-1c37-4c5f-91de-24890f37478b",
+      "username": "用户_4",
+      "ip_address": "192.168.1.101",
+      "device_info": "test device 1",
+      "last_seen": "2026-01-16 16:36:58"
+    },
+    {
+      "user_id": "289e12ca-e813-42a9-8009-b43b5300e7a1",
+      "username": "用户_5",
+      "ip_address": "192.168.1.102",
+      "device_info": "test device 2",
+      "last_seen": "2026-01-16 16:36:58"
+    },
+    {
+      "user_id": "ffbbd5fd-6d51-494e-a9ce-fc73d18c7527",
+      "username": "用户_6",
+      "ip_address": "192.168.1.103",
+      "device_info": "test device 3",
+      "last_seen": "2026-01-16 16:42:03"
+    },
+    {
+      "user_id": "d6364ca5-ae50-4cef-be10-3a4ec2807d9f",
+      "username": "用户_7",
+      "ip_address": "192.168.1.104",
+      "device_info": "test device 4",
+      "last_seen": "2026-01-16 16:53:43"
+    }
+  ]
+}
